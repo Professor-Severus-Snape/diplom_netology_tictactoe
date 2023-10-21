@@ -1,17 +1,27 @@
 const players = ["x", "o"];
-let activePlayer;
-let board;
+let activePlayer = 0;
+let board = [];
+const boardSize = 3;  // переменная хранит размер игрового поля
 
+// функция, запускающая новую игру:
 function startGame() {
   activePlayer = 0;
-  board = [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ];
+  createBoard(boardSize);
   renderBoard(board);
 }
 
+// функция, создающая квадратное поле любого размера:
+function createBoard(boardSize) {
+  board = [];
+  for (let i = 0; i < boardSize; i++) {
+    board.push([]);
+    for (let j = 0; j < boardSize; j++) {
+      board[i].push("");
+    }
+  }
+}
+
+// функция, обрабатывающая клик игрока:
 function click(row, col) {
   board[row][col] = players[activePlayer];
   renderBoard(board);
@@ -23,6 +33,7 @@ function click(row, col) {
   }
 }
 
+// функция, проверяющая не выиграл ли игрок (поле 3*3):
 function checkWinner(row, col) {
   let flag = 0;
 
@@ -39,6 +50,7 @@ function checkWinner(row, col) {
   return flag;
 }
 
+// функция, передающая ход следующему игроку:
 function changeActivePlayer() {
   if (activePlayer) {
     activePlayer = 0;
