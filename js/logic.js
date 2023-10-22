@@ -1,7 +1,8 @@
 const players = ["x", "o"];
-let activePlayer = 0;
+let activePlayer;
 let board = [];
-const boardSize = 3;  // переменная хранит размер игрового поля
+const boardSize = 5; // размер квадрата игрового поля
+const winBlock = 3;  // длина выигрышной комбинации
 
 // функция, запускающая новую игру:
 function startGame() {
@@ -26,28 +27,52 @@ function click(row, col) {
   board[row][col] = players[activePlayer];
   renderBoard(board);
 
-  if (checkWinner(row, col)) {
+  if (checkWinner(+row, +col)) {
     showWinner(activePlayer);
   } else {
     changeActivePlayer();
   }
 }
 
-// функция, проверяющая не выиграл ли игрок (поле 3*3):
-function checkWinner(row, col) {
-  let flag = 0;
+// итоговая проверка выигрыша:
+function checkWinner() { 
+	for (let offsetX = 0; offsetX < 3; offsetX++) { 
+		for (let offsetY = 0; offsetY < 3; offsetY++) {
+			if ( checkDiagonal(offsetX, offsetY) || checkLines(offsetX, offsetY) ) return true;
+		}	
+	}
+	return false; 
+}
 
-  if (board[row][0] === players[activePlayer] && board[row][0] === board[row][1] && board[row][1] === board[row][2]) {
-    flag = 1;
-  } else if (board[0][col] === players[activePlayer] && board[0][col] === board[1][col] && board[1][col] === board[2][col]) {
-    flag = 1;
-  } else if (board[0][0] === players[activePlayer] && board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
-    flag = 1;
-  } else if (board[0][2] === players[activePlayer] && board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
-    flag = 1;
-  }
+// проверка диагоналей - нормально не работает!!!
+function checkDiagonal(offsetX, offsetY) { 
+  let toRight = 1, toLeft = 1;
+  for (let i = offsetX; i < winBlock + offsetX; i++) {
+		toRight &= (board[i][i] == players[activePlayer]);
+		toLeft &= (board[winBlock + offsetX - i - 1][i] == players[activePlayer]);
+	}
+	// for (let i = 0; i < 3; i++) {
+	// 	toRight &= (board[i][i] == players[activePlayer]);
+	// 	toLeft &= (board[3-i-1][i] == players[activePlayer]);
+	// }
+	return (toRight || toLeft); 
+}
 
-  return flag;
+// проверка горизонталей и вертикалей:
+function checkLines(offsetX, offsetY) { 
+  let horizont, vertical;
+	for (let i = offsetX; i < winBlock + offsetX; i++) {
+		horizont = 1;
+		vertical = 1;
+		for (let j = offsetY; j < winBlock + offsetY; j++) {
+			horizont &= (board[i][j] == players[activePlayer]);
+			vertical &= (board[j][i] == players[activePlayer]);
+		}
+		if (horizont || vertical) {
+      return true;
+    }
+	}
+	return false; 
 }
 
 // функция, передающая ход следующему игроку:
