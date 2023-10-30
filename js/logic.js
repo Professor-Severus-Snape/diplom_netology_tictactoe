@@ -26,66 +26,75 @@ function createBoard(boardSize) {
 function click(row, col) {
   board[row][col] = players[activePlayer];
   renderBoard(board);
-
-  if (checkWinner()) {
-    showWinner(activePlayer);
-  } else {
-    changeActivePlayer();
-  }
+  checkWinner() ? showWinner(activePlayer) : changeActivePlayer();
 }
 
 // проверка выигрыша:
-function checkWinner() { 
-  for (let offsetX = 0; offsetX <= (boardSize - winBlock); offsetX++) { 
+function checkWinner() {
+  for (let offsetX = 0; offsetX <= (boardSize - winBlock); offsetX++) {
 		for (let offsetY = 0; offsetY <= (boardSize - winBlock); offsetY++) {
-      if ( checkDiagonalToRight(offsetX, offsetY) || checkDiagonalToLeft(offsetX, offsetY) || checkLines(offsetX, offsetY) ) {
+      if (
+        checkDiagonalToRight(offsetX, offsetY) ||
+        checkDiagonalToLeft(offsetX, offsetY) ||
+        checkHorizontal(offsetX, offsetY) ||
+        checkVertical(offsetX, offsetY)
+      ) {
         return true;
       }
-		}	
+		}
 	}
-	return false; 
+	return false;
 }
 
 // проверка диагонали, идущей слева направо сверху вниз:
-function checkDiagonalToRight(offsetX, offsetY) { 
+function checkDiagonalToRight(offsetX, offsetY) {
   let toRight = 1;
   for (let i = offsetX; i < winBlock + offsetX; i++) {
     toRight &= (board[i][offsetY++] == players[activePlayer]);
   }
-  return toRight; 
+  return toRight;
 }
 
 // проверка диагонали, идущей справо налево сверху вниз:
-function checkDiagonalToLeft(offsetX, offsetY) { 
+function checkDiagonalToLeft(offsetX, offsetY) {
   let toLeft = 1;
   for (let i = offsetX; i < winBlock + offsetX; i++) {
-    toLeft &= (board[i][winBlock + offsetX - i - 1 + offsetY] == players[activePlayer]); 
+    toLeft &= (board[i][winBlock + offsetX - i - 1 + offsetY] == players[activePlayer]);
   }
-  return toLeft; 
+  return toLeft;
 }
 
-// проверка горизонталей и вертикалей:
-function checkLines(offsetX, offsetY) { 
-  let horizontal, vertical;
+// проверка горизонтали:
+function checkHorizontal(offsetX, offsetY) {
+  let horizontal;
 	for (let i = offsetX; i < winBlock + offsetX; i++) {
 		horizontal = 1;
-		vertical = 1;
 		for (let j = offsetY; j < winBlock + offsetY; j++) {
 			horizontal &= (board[i][j] == players[activePlayer]);
-			vertical &= (board[j][i] == players[activePlayer]);
 		}
-		if (horizontal || vertical) {
+		if (horizontal) {
       return true;
     }
 	}
-	return false; 
+	return false;
 }
+
+// проверка вертикали:
+  function checkVertical(offsetX, offsetY) {
+    let vertical;
+  	for (let i = offsetX; i < winBlock + offsetX; i++) {
+  		vertical = 1;
+  		for (let j = offsetY; j < winBlock + offsetY; j++) {
+  			vertical &= (board[j][i] == players[activePlayer]);
+  		}
+  		if (vertical) {
+        return true;
+      }
+  	}
+  	return false;
+  }
 
 // функция, передающая ход следующему игроку:
 function changeActivePlayer() {
-  if (activePlayer) {
-    activePlayer = 0;
-  } else {
-    activePlayer = 1;
-  }
+  activePlayer ? activePlayer = 0 : activePlayer = 1;
 }
